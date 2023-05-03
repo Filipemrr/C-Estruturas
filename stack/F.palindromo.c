@@ -65,7 +65,7 @@ int main() {
             push(pilha,string[i]); 
         }
     }
-
+//arara
     //empilho todos os elementos de forma invertida na pilha auxiliar 
     int j;
     for(j = size - 1; j >= 0; j--){
