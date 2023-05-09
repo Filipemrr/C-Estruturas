@@ -96,6 +96,7 @@ void imprimir(Stack *principal){
     Node *novo = principal -> top;
     if(novo != NULL){
         while(novo != NULL){
+            novo->data +=2;
             printf("%d\n", novo->data);
             novo = novo->next;
         }
@@ -104,8 +105,23 @@ void imprimir(Stack *principal){
 
 
 int main(){
-    srand(time(NULL));
-    int numero_de_Cartas = rand() % 21;//leio o numero total de cartas 
+    printf("\n");
+    printf("Digite 1 para o baralho ter tamanho gerado aleatoriamente\n");
+    printf("Digite 2 para escolher o tamanho do baralho\n");
+    printf("Escolha um numero: ");
+    int numero_de_Cartas;
+    scanf("%d", &numero_de_Cartas);
+
+    if(numero_de_Cartas == 1){
+        srand(time(NULL));
+        numero_de_Cartas = rand() % 21;
+//leio o numero total de cartas
+    }
+    else{
+        printf("Escolha o tamanho do baralho: ");
+        scanf("%d", &numero_de_Cartas);
+    }
+
     printf("o tamanho do baralho na partida foi: %d\n", numero_de_Cartas);
 
 
@@ -115,7 +131,9 @@ int main(){
 
     //criando o baralho
     for (int i = 0; i < numero_de_Cartas; i++) {
-        int carta = rand() % 51; // gera um número aleatório de 0 a 100
+        int carta = (rand() % 51) + 1;
+        if(carta == -1)
+            carta+=2;
         push(baralho,carta);
     }
 
@@ -127,6 +145,7 @@ int main(){
     jogador_A->top = NULL; 
     jogador_B->top = NULL;
     //destribui as cartas
+    printf("\n");
     while(1){
         if(is_empty(baralho))
             break;
@@ -135,26 +154,28 @@ int main(){
         push(jogador_B,pop(baralho));
     }
     
-    embaralhar_pilha(jogador_A);
+    //embaralhar_pilha(jogador_A);
     printf("cartas do jogador A:\n");
     imprimir(jogador_A);
 
-    embaralhar_pilha(jogador_B);
+    //embaralhar_pilha(jogador_B);
     printf("cartas do jogador B:\n");
     imprimir(jogador_B);
     
+    printf("\n :---- As Rodadas foram ----:\n");
+
     while(1)
     {
         if(is_empty(jogador_A) || is_empty(jogador_B)){
             if(is_empty(jogador_A) && is_empty(jogador_B) == 0){
-                printf("O jogador B ganhou\n");
-                printf("Seu baralho final foi:");
+                printf("\n\n:------O jogador B ganhou-------:\n");
+                printf("E Seu baralho final foi:\n");
                 imprimir(jogador_B);
                 break;
             }
             else if(is_empty(jogador_B) && is_empty(jogador_A) == 0){
-                printf("O jogador A ganhou\n");
-                printf("Seu baralho final foi:\n");
+                printf("\n\n:------O jogador A ganhou--------:\n");
+                printf("E Seu baralho final foi:\n");
                 imprimir(jogador_A);
                 break;
             }
@@ -168,6 +189,6 @@ int main(){
         embaralhar_pilha(jogador_A);
         embaralhar_pilha(jogador_B);
     }
-
+    printf("\n");
     return 0;
 }
