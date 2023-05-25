@@ -11,6 +11,7 @@ int coluna_cima = 0;
 int andar_baixo = 0;
 int coluna_baixo = 0;
 int retorno;
+int andar_exclusao, coluna_exclusao;
 int elevador_mais_proximo_andar, elevador_mais_proximo_coluna;
 char *matriz[LINHAS][COLUNAS];
 
@@ -103,7 +104,7 @@ void limpar_matriz()
         {
             for (int j = 0; j < COLUNAS; j++)
             {
-                if (strcmp(matriz[i][j], "[\033[32m⊠\033[0m]") == 0 || strcmp(matriz[i][j], "[\033[93m⊠\033[0m]") == 0)
+                if (strcmp(matriz[i][j], "[\033[32m⇳\033[0m]") == 0 || strcmp(matriz[i][j], "[\033[93m⇫\033[0m]") == 0)
                 {
                     matriz[i][j] = "[ ]";
                 }
@@ -133,11 +134,11 @@ void printar_predio()
                 printf("%s ", matriz[i][j]);
             }
             printf("\n");
-            // usleep(6000);
+            //usleep(60000);
         }
     }
 
-void tracar_caminho(int andar1, int coluna1, int andar2, int coluna2)
+void tracar_busca(int andar1, int coluna1, int andar2, int coluna2)
 {
     int indice_andar = andar1;
     int indice_coluna = coluna1;
@@ -149,7 +150,7 @@ void tracar_caminho(int andar1, int coluna1, int andar2, int coluna2)
     {
         if (indice_andar != andar1 || indice_coluna != coluna1)
         {
-            matriz[indice_andar][indice_coluna] = "[\033[32m⊠\033[0m]";
+            matriz[indice_andar][indice_coluna] = "[\033[32m⇳\033[0m]";
         }
 
         if (indice_coluna != coluna2)
@@ -162,7 +163,67 @@ void tracar_caminho(int andar1, int coluna1, int andar2, int coluna2)
         }
     }
 }
+void mover_ponto_vermelho_adjacente(int andar, int coluna)
+{
+    // Verificando e movendo o ponto vermelho para uma casa adjacente vazia
+    if (coluna > 0 && matriz[andar][coluna - 1] == "[ ]")
+    {
+        matriz[andar][coluna - 1] = "[\033[31m⊠\033[0m]";
+        matriz[andar][coluna] = "[ ]";
+    }
+    else if (coluna < COLUNAS - 1 && matriz[andar][coluna + 1] == "[ ]")
+    {
+        matriz[andar][coluna + 1] = "[\033[31m⊠\033[0m]";
+        matriz[andar][coluna] = "[ ]";
+    }
+    else if (andar > 0 && matriz[andar - 1][coluna] == "[ ]")
+    {
+        matriz[andar - 1][coluna] = "[\033[31m⊠\033[0m]";
+        matriz[andar][coluna] = "[ ]";
+    }
+    else if (andar < LINHAS - 1 && matriz[andar + 1][coluna] == "[ ]")
+    {
+        matriz[andar + 1][coluna] = "[\033[31m⊠\033[0m]";
+        matriz[andar][coluna] = "[ ]";
+    }
+}
 
+void ir_ate_andar(int andar_desejado, int andar_elevador_amarelo, int coluna_elevador_amarelo){
+    // Movendo o elevador na vertical pra baixo
+    if (andar_desejado > andar_elevador_amarelo)
+    {
+        andar_elevador_amarelo++;
+        while (andar_elevador_amarelo <= andar_desejado)
+        {
+            if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[ ]")
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+            
+            else{
+                mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+            }
+            andar_elevador_amarelo++;
+        }
+    }
+    //movendo elevador na vertical pra cima
+    else if (andar_desejado <= andar_elevador_amarelo)
+    {
+        andar_elevador_amarelo--;
+        while (andar_elevador_amarelo > andar_desejado)
+        {
+            if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[ ]"){
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+            }
+            
+            else{
+                mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+            }
+            andar_elevador_amarelo--;
+        }
+    }
+    return;
+}
 
 
 int main()
@@ -170,6 +231,7 @@ int main()
     // Inicializando a semente do gerador de números aleatórios
     srand(time(0));
 
+    //gera a matriz
     for (int i = 0; i < LINHAS; i++)
     {
         for (int j = 0; j < COLUNAS; j++)
@@ -178,7 +240,7 @@ int main()
         }
     }
 
-    // Adicionando [E] aleatoriamente em cada coluna
+    // Adicionando [elevadores] aleatoriamente em cada coluna
     for (int j = 0; j < COLUNAS; j++)
     {
         for (int k = 0; k < 5; k++)
@@ -187,42 +249,68 @@ int main()
             matriz[random_row][j] = "[\033[31m⊠\033[0m]";
         }
     }
-    printf("\n");
-    printar_predio();
-    printf("     2   1   0\n\n");
 
-    while (1)
+
+    int andar, porta, escolha;
+    
+
+while (1)
+{
+
+    // gera 
+    int andar_destino;
+    andar = rand() % LINHAS; 
+    porta = rand() % COLUNAS;
+    //gerando o pedido
+    matriz[andar][porta] = "[\033[93m⊠\033[0m]";  
+    
+
+
+    // solicita um elevador 
+    printf("Quer pedir um elevador? Aperte 1\n");
+    printf("Faça uma escolha: ");
+    int escolha;
+    scanf("%d", &escolha);
+
+
+    if (escolha == 1)
     {
-        int andar, porta, escolha;
-
-        printf("Quer pedir um elevador? Aperte 1\n");
-        printf("Se já chegou onde quer, aperte 2\n");
-        printf("Faça uma escolha: ");
-        scanf("%d", &escolha);
-
-        if (escolha == 1)
-        {
-            andar = rand() % LINHAS;
-            porta = rand() % COLUNAS;
-
-            matriz[andar][porta] = "[\033[93m⊠\033[0m]";
-            retorno = achar_mais_proximo(andar, porta);
-        }
-        if (escolha == 2)
-        {
-            if (retorno == 1 || retorno == 2)
-                tracar_caminho(andar, porta, andar_cima, coluna_cima);
-
-            if (retorno == 0)
-                tracar_caminho(andar, porta, andar_baixo, coluna_baixo);
-        }
-        if (escolha == 3)
-        {
-            printar_predio();
+        int flagCima = 0;
+        int flagBaixo = 0;
+        
+        // pra onde foi pedido o elevador
+        printf("\nPara que andar vai ?");
+        scanf("%d", &andar_destino);
+        
+        retorno = achar_mais_proximo(andar, porta);
+        
+        if (retorno == 1 || retorno == 2){
+            tracar_busca(andar, porta, andar_cima, coluna_cima);
+            flagCima = 1;
+            andar_exclusao = andar_cima;
+            coluna_exclusao = coluna_cima;
         }
 
-        // usleep(1000000);  // Pausa de 1 segundo
+        if (retorno == 0){
+            tracar_busca(andar, porta, andar_baixo, coluna_baixo);
+            flagBaixo = 1;
+            andar_exclusao = andar_baixo;
+            coluna_exclusao = coluna_baixo;
+        }
+
+        ir_ate_andar(andar_destino, andar, porta);
+                    
+        matriz[andar_destino][porta] = "[\033[31m⊠\033[0m]";
+        printar_predio();
+        matriz[andar_exclusao][coluna_exclusao] = "[ ]";
+        matriz[andar][porta] = "[ ]";
+        limpar_matriz();
     }
+        
+
+}
+
+
 
     return 0;
 }
