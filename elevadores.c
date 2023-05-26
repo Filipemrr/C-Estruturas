@@ -195,11 +195,11 @@ void ir_ate_andar(int andar_desejado, int andar_elevador_amarelo, int coluna_ele
         andar_elevador_amarelo++;
         while (andar_elevador_amarelo <= andar_desejado)
         {
-            if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[ ]")
-                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
-            
-            else{
+            if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[\033[31m⊠\033[0m]"){
                 mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+            }
+            else{
                 matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
             }
             andar_elevador_amarelo++;
@@ -211,12 +211,12 @@ void ir_ate_andar(int andar_desejado, int andar_elevador_amarelo, int coluna_ele
         andar_elevador_amarelo--;
         while (andar_elevador_amarelo > andar_desejado)
         {
-            if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[ ]"){
+            if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[\033[31m⊠\033[0m]"){
+                mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
                 matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
             }
             
             else{
-                mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
                 matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
             }
             andar_elevador_amarelo--;
@@ -259,8 +259,8 @@ while (1)
 
     // gera 
     int andar_destino;
-    andar = rand() % LINHAS; 
-    porta = rand() % COLUNAS;
+    andar = 40;
+    porta = 2;
     //gerando o pedido
     matriz[andar][porta] = "[\033[93m⊠\033[0m]";  
     
