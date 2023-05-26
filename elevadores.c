@@ -134,7 +134,7 @@ void printar_predio()
                 printf("%s ", matriz[i][j]);
             }
             printf("\n");
-            //usleep(60000);
+            usleep(60000);
         }
     }
 
@@ -197,7 +197,7 @@ void ir_ate_andar(int andar_desejado, int andar_elevador_amarelo, int coluna_ele
         {
             if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[\033[31m⊠\033[0m]"){
                 mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
-                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[31m⇫\033[0m]";
             }
             else{
                 matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
@@ -213,11 +213,11 @@ void ir_ate_andar(int andar_desejado, int andar_elevador_amarelo, int coluna_ele
         {
             if(matriz[andar_elevador_amarelo][coluna_elevador_amarelo] == "[\033[31m⊠\033[0m]"){
                 mover_ponto_vermelho_adjacente(andar_elevador_amarelo,coluna_elevador_amarelo);
-                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[31m⇫\033[0m]";
             }
             
             else{
-                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[93m⇫\033[0m]";
+                matriz[andar_elevador_amarelo][coluna_elevador_amarelo] = "[\033[31m⇫\033[0m]";
             }
             andar_elevador_amarelo--;
         }
