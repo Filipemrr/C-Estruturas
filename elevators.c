@@ -18,6 +18,7 @@ int i_fila = 0;
 
 typedef struct
 {
+    int numero;
     int andar_atual;
     int andar_final;
     int corredor_atual;
@@ -27,7 +28,7 @@ typedef struct
 
 Call calls[15];
 
-// limpa a matriz e printa o predio, funcoes de prompt
+// limpa a matriz e printa o predio, funcoes primarias
 void limpar_matriz()
 {
     for (int i = 0; i < LINHAS; i++)
@@ -41,97 +42,6 @@ void limpar_matriz()
         }
     }
 }
-void printar_predio()
-{
-    for (int i = LINHAS - 1; i >= 0; i--)
-    {
-        if (i <= 9)
-        {
-            printf("   %d", i);
-        }
-        else if (i > 9 && i <= 99)
-        {
-            printf("  %d", i);
-        }
-        else
-        {
-            printf(" %d", i);
-        }
-
-        for (int j = COLUNAS - 1; j >= 0; j--)
-        {
-            printf("%s ", matriz[i][j]);
-        }
-        printf("\n");
-        // usleep(60000);
-    }
-}
-
-void mover_ponto_vermelho_adjacente(int andar, int coluna)
-{
-    // Verificando e movendo o ponto vermelho para uma casa adjacente vazia
-    if (coluna > 0 && matriz[andar][coluna - 1] == "[ ]")
-    {
-        matriz[andar][coluna - 1] = "[\033[91m⊠\033[0m]";
-        matriz[andar][coluna] = "[ ]";
-    }
-    else if (coluna < COLUNAS - 1 && matriz[andar][coluna + 1] == "[ ]")
-    {
-        matriz[andar][coluna + 1] = "[\033[91m⊠\033[0m]";
-        matriz[andar][coluna] = "[ ]";
-    }
-    else if (andar > 0 && matriz[andar - 1][coluna] == "[ ]")
-    {
-        matriz[andar - 1][coluna] = "[\033[91m⊠\033[0m]";
-        matriz[andar][coluna] = "[ ]";
-    }
-    else if (andar < LINHAS - 1 && matriz[andar + 1][coluna] == "[ ]")
-    {
-        matriz[andar + 1][coluna] = "[\033[91m⊠\033[0m]";
-        matriz[andar][coluna] = "[ ]";
-    }
-}
-
-void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
-{
-    if (andar_desejado > andar_atual)
-    {
-        andar_atual++;
-        if (matriz[andar_atual][coluna_atual] == "[\033[31m⊠\033[0m]" || matriz[andar_atual][coluna_atual] == "[\033[91m⊠\033[0m]")
-        {
-            mover_ponto_vermelho_adjacente(andar_atual, coluna_atual);
-            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]"; // anda uma casa
-            matriz[andar_atual - 1][coluna_atual] = "[ ]";            // libera a casa que ele estava anteriormente
-        }
-        else
-        {
-            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]";
-            matriz[andar_atual - 1][coluna_atual] = "[ ]";
-        }
-    }
-    else if (andar_desejado > andar_atual)
-    {
-        andar_atual--;
-        if (matriz[andar_atual][coluna_atual] == "[\033[31m⊠\033[0m]" || matriz[andar_atual][coluna_atual] == "[\033[91m⊠\033[0m]")
-        {
-            mover_ponto_vermelho_adjacente(andar_atual, coluna_atual);
-            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]"; // anda uma casa
-            matriz[andar_atual - 1][coluna_atual] = "[ ]";            // libera a casa que ele estava anteriormente
-        }
-        else
-        {
-            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]";
-            matriz[andar_atual - 1][coluna_atual] = "[ ]";
-        }
-    }
-    calls[indice].andar_atual = andar_atual; // atualiza a casa atual
-
-    if (calls[indice].andar_atual == calls[indice].andar_final)
-        calls[indice].chegou = 1;
-
-    return;
-}
-
 void iniciando_elevador()
 {
     srand(time(0));
@@ -163,34 +73,108 @@ void iniciando_elevador()
     }
 }
 
-// essas 2 funcoes interagem juntas e servem para tracar a busca ate o pedido que foi feito
-//"buscando pedido" recebe o pedido, usa a "achar mais proximo" para encontrar o elevador mais proximo
-// entao, o elevador mais proximo vai ate o pedido que foi feito.
-void tracar_busca(int andar1, int coluna1, int andar2, int coluna2)
+//Funcoes de deslocamento
+void mover_ponto_vermelho_adjacente(int andar, int coluna)
 {
-    int indice_andar = andar1;
-    int indice_coluna = coluna1;
-
-    int delta_andar = (andar2 > andar1) ? 1 : -1;
-    int delta_coluna = (coluna2 > coluna1) ? 1 : -1;
-
-    while (indice_andar != andar2 || indice_coluna != coluna2)
+    // Verificando e movendo o ponto vermelho para uma casa adjacente vazia
+    
+    //coluna
+    if (coluna > 0 && matriz[andar][coluna - 1] == "[ ]")
     {
-        if (indice_andar != andar1 || indice_coluna != coluna1)
-        {
-            matriz[indice_andar][indice_coluna] = "[\033[32m⇳\033[0m]";
+        matriz[andar][coluna - 1] = "[\033[91m⊠\033[0m]";
+
+        for(int i = 0; i < i_fila; i++){
+            if(calls[i].andar_atual == andar && calls[i].corredor_atual == coluna){
+                calls[i].corredor_atual = coluna - 1;
+            }
         }
 
-        if (indice_coluna != coluna2)
-        {
-            indice_coluna += delta_coluna;
+        matriz[andar][coluna] = "[ ]";
+    }
+    //coluna 
+    else if (coluna < COLUNAS - 1 && matriz[andar][coluna + 1] == "[ ]")
+    {
+        matriz[andar][coluna + 1] = "[\033[91m⊠\033[0m]";
+        
+        for(int i = 0; i < i_fila; i++){
+            if(calls[i].andar_atual == andar && calls[i].corredor_atual == coluna){
+                calls[i].corredor_atual = coluna + 1;
+            }
         }
-        else if (indice_andar != andar2)
-        {
-            indice_andar += delta_andar;
+
+        matriz[andar][coluna] = "[ ]";
+    }
+    
+    //andar
+    else if (andar > 0 && matriz[andar - 1][coluna] == "[ ]")
+    {
+        matriz[andar - 1][coluna] = "[\033[91m⊠\033[0m]";
+        //atualizando posicao do elevador deslocado
+        for(int i = 0; i < i_fila; i++){
+            if(calls[i].andar_atual == andar && calls[i].corredor_atual == coluna){
+                calls[i].andar_atual = andar - 1;
+            }
         }
+
+        matriz[andar][coluna] = "[ ]";
+    }
+
+    //andar
+    else if (andar < LINHAS - 1 && matriz[andar + 1][coluna] == "[ ]")
+    {
+        matriz[andar + 1][coluna] = "[\033[91m⊠\033[0m]";
+        for(int i = 0; i < i_fila; i++){
+            if(calls[i].andar_atual == andar && calls[i].corredor_atual == coluna){
+                calls[i].andar_atual = andar + 1;
+            }
+        }
+        matriz[andar][coluna] = "[ ]";
     }
 }
+void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
+{
+    if (andar_desejado > andar_atual)
+    {
+        if (matriz[andar_atual + 1][coluna_atual] == "[\033[31m⊠\033[0m]" || matriz[andar_atual + 1][coluna_atual] == "[\033[91m⊠\033[0m]")
+        {
+            mover_ponto_vermelho_adjacente(andar_atual + 1, coluna_atual);
+            andar_atual ++;
+            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]"; // anda uma casa
+            matriz[andar_atual - 1][coluna_atual] = "[ ]";            // libera a casa que ele estava anteriormente
+        }
+        else
+        {
+            andar_atual++;
+            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]";
+            matriz[andar_atual - 1][coluna_atual] = "[ ]";
+        }
+    }
+    else if (andar_desejado < andar_atual)
+    {
+        if (matriz[andar_atual - 1][coluna_atual] == "[\033[31m⊠\033[0m]" || matriz[andar_atual - 1][coluna_atual] == "[\033[91m⊠\033[0m]")
+        {
+            mover_ponto_vermelho_adjacente(andar_atual - 1, coluna_atual);
+            andar_atual--;
+            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]"; // anda uma casa
+            matriz[andar_atual - 1][coluna_atual] = "[ ]";            // libera a casa que ele estava anteriormente
+        }
+        else
+        {
+            andar_atual--;
+            matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]";
+            matriz[andar_atual - 1][coluna_atual] = "[ ]";
+        }
+    }
+    calls[indice].andar_atual = andar_atual; // atualiza a casa
+
+    if (calls[indice].andar_atual == calls[indice].andar_final)
+        calls[indice].chegou = 1;
+
+    return;
+}
+
+
+//funcoes de procura
 int achar_mais_proximo(int andar, int porta)
 {
     int flag_up = 0;
@@ -277,7 +261,6 @@ int achar_mais_proximo(int andar, int porta)
     else // ambas tem mesma distancia
         return 2;
 }
-
 void buscando_pedido()
 {
     int flagCima = 0;
@@ -324,12 +307,20 @@ void buscando_pedido()
 
 
     //inicia um elevador
-    printf("%d\n",calls[i_fila].andar_atual = andar);
-    printf("%d\n",calls[i_fila].corredor_atual = porta);
-    printf("%d\n",calls[i_fila].andar_final = andar_destino);
-    printf("%d\n",calls[i_fila].corredor_final = porta);
+    printf("\n");
+    printf("\033[31m____________________\033[0m\n");
+
+    printf("Elevador %d cadastrado\n", i_fila);
+
+    printf("ANDAR ATUAL %d\n",calls[i_fila].andar_atual = andar);
+    printf("PORTA ATUAL %d\n",calls[i_fila].corredor_atual = porta);
+    printf("ANDAR DESTINO %d\n",calls[i_fila].andar_final = andar_destino);
+    printf("CORREDOR FINAL %d\n",calls[i_fila].corredor_final = porta);
     calls[i_fila].chegou = 0;
     i_fila++;
+
+    printf("\033[31m____________________\033[0m\n");
+
 }
 
 int main()
@@ -337,25 +328,23 @@ int main()
     // inicia elevadores.
     iniciando_elevador();
     int escolha;
-
     while (1)
     {
         // solicita um elevador
+        printf("\n\n");
         printf("Aperte 1 para pedir um elevador?\n");
         printf("Aperte 2 para encerrar");
         printf("\nFaça uma escolha: ");
-        int escolha;
         scanf("%d", &escolha);
 
         if (escolha == 1)
         {
             buscando_pedido();
             // anda uma casa pra todo mundo
-            exit(1);
             for (int i = 0; i < i_fila; i++)
             {
                 if (calls[i].chegou == 0)
-                    caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].andar_final, i);
+                    caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].corredor_atual, i);
             }
         }
         if (escolha == 2)
@@ -364,9 +353,10 @@ int main()
             {
                 while (calls[i].chegou == 0)
                 {
-                    caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].andar_final, i);
+                    caminhar(calls[i].andar_final, calls[i].andar_atual,calls[i].corredor_atual, i);
                 }
-                printf("O elevador %d chegou ao seu destino: ANDAR %d PORTA%d", i, calls[i].andar_atual, calls[i].corredor_atual);
+                usleep(60000);
+                printf("\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
             }
             exit(1);
         }
