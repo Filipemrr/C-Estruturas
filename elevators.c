@@ -11,9 +11,10 @@ int coluna_cima = 0;
 int andar_baixo = 0;
 int coluna_baixo = 0;
 int retorno;
-int andar_exclusao, coluna_exclusao;
+int andar_exclusao, coluna_exclusao; // auxiliar que indica o andar e a coluna do elevador mais proximo
 int elevador_mais_proximo_andar, elevador_mais_proximo_coluna;
 char *matriz[LINHAS][COLUNAS];
+
 
 int achar_mais_proximo(int andar, int porta)
 {
@@ -27,7 +28,7 @@ int achar_mais_proximo(int andar, int porta)
         for (int w = 0; w < 3; w++)
         {
             //achou
-            if (matriz[andar + i][w] != "[ ]"){
+            if (matriz[andar + i][w] == "[\033[31m⊠\033[0m]"){
                 flag_up = 1;
 
                 if(matriz[andar + i][porta] != "[ ]")
@@ -58,7 +59,7 @@ int achar_mais_proximo(int andar, int porta)
         for (int w = 0; w < 3; w++){
 
             //achou
-            if (matriz[andar - i][w] != "[ ]"){
+            if (matriz[andar - i][w] == "[\033[31m⊠\033[0m]"){
                 flag_down = 1;
                 andar_baixo = andar - i;
 
@@ -66,12 +67,11 @@ int achar_mais_proximo(int andar, int porta)
                     coluna_baixo = porta;
                 else
                     coluna_baixo = w;
-
                 break;
             }
             //matriz[andar - i][w] = "[\033[32m⊠\033[0m]";
             if (andar - i <= 0){
-                printf("\nNenhuma elevador acima");
+                //printf("\nNenhuma elevador acima");
                 break;
             }
         }
@@ -88,16 +88,17 @@ int achar_mais_proximo(int andar, int porta)
     elevador_baixo = (andar - andar_baixo) + (porta - coluna_baixo);
 
     //varredura de cima eh mais proxima
-    if(elevador_cima < elevador_baixo)
+    if(elevador_cima < elevador_baixo && flag_up == 1)
         return 1;
     //varredura de baixo eh mais proxima
-    else if (elevador_baixo < elevador_cima)
+    else if (elevador_baixo < elevador_cima && flag_down == 1)
         return 0;
     else//ambas tem mesma distancia
         return 2;
     
 }
 
+//limpa a matrix dos caminhos traçados
 void limpar_matriz()
     {
         for (int i = 0; i < LINHAS; i++)
@@ -138,6 +139,7 @@ void printar_predio()
         }
     }
 
+//procura o elevador mais proximo do pedido que foi feito
 void tracar_busca(int andar1, int coluna1, int andar2, int coluna2)
 {
     int indice_andar = andar1;
@@ -163,6 +165,7 @@ void tracar_busca(int andar1, int coluna1, int andar2, int coluna2)
         }
     }
 }
+
 void mover_ponto_vermelho_adjacente(int andar, int coluna)
 {
     // Verificando e movendo o ponto vermelho para uma casa adjacente vazia
@@ -225,10 +228,7 @@ void ir_ate_andar(int andar_desejado, int andar_elevador_amarelo, int coluna_ele
     return;
 }
 
-
-int main()
-{
-    // Inicializando a semente do gerador de números aleatórios
+void iniciando_elevador(){
     srand(time(0));
 
     //gera a matriz
@@ -241,55 +241,51 @@ int main()
     }
 
     // Adicionando [elevadores] aleatoriamente em cada coluna
-    for (int j = 0; j < COLUNAS; j++)
+    // printando posicao dos elevadores
+    int indice = 0;
+    printf("Elevadores estao nas posicoes:\n");
+    for(int j = 0; j < COLUNAS; j++)
     {
+        indice++;
         for (int k = 0; k < 5; k++)
         {
             int random_row = rand() % LINHAS;
             matriz[random_row][j] = "[\033[31m⊠\033[0m]";
+            printf("Elevador %d no andar %d coluna %d\n",indice, random_row, j);
+            indice++;
         }
+        printf("\n");
     }
 
+}
 
-    int andar, porta, escolha;
-    printf("\n------------GUIA------------");
-    printf("\n\nOnde o pedido foi feito: [\033[93m⊠\033[0m]\n");
-    printf("Elevadores: [\033[31m⊠\033[0m]\n");//vermelho
-    printf("elevador vazio em movimento: [\033[32m⇳\033[0m]\n");
-    printf("Elevador com pessoas em movimento: [\033[93m⇫\033[0m]\n\n");
-
-while (1)
-{
-
-    // gera 
-    int andar_destino;
-    andar = 40;
-    porta = 2;
-    //gerando o pedido
-    matriz[andar][porta] = "[\033[93m⊠\033[0m]";  
-    
-
-
-    // solicita um elevador 
-    printf("Aperte 1 para pedir um elevador?\n");
-    printf("Faça uma escolha: ");
-    int escolha;
-    scanf("%d", &escolha);
-
-
-    if (escolha == 1)
-    {
-        int flagCima = 0;
+void buscando_pedido(){
+     int flagCima = 0;
         int flagBaixo = 0;
+        int andar, porta;
+        int andar_destino;
         
         // pra onde foi pedido o elevador
+        printf("\nQue andar voce esta? ");
+        scanf("%d", &andar);  
+
+        porta = rand() % COLUNAS;
+
         printf("\nPara que andar vai ?");
         scanf("%d", &andar_destino);
+
         
+        matriz[andar][porta] = "[\033[93m⊠\033[0m]";
+
+        if(andar > 299 || porta < 0 || porta >2){
+            printf("Erro, entrada Invalida\n");
+            return;
+        } 
+            
         retorno = achar_mais_proximo(andar, porta);
         
         if (retorno == 1 || retorno == 2){
-            tracar_busca(andar, porta, andar_cima, coluna_cima);
+            //tracar_busca(andar, porta, andar_cima, coluna_cima);
             flagCima = 1;
             andar_exclusao = andar_cima;
             coluna_exclusao = coluna_cima;
@@ -302,14 +298,38 @@ while (1)
             coluna_exclusao = coluna_baixo;
         }
 
-        ir_ate_andar(andar_destino, andar, porta);
-                    
+        //ir_ate_andar(andar_destino, andar, porta);             
         matriz[andar_destino][porta] = "[\033[31m⊠\033[0m]";
         printar_predio();
         matriz[andar_exclusao][coluna_exclusao] = "[ ]";
         matriz[andar][porta] = "[ ]";
         limpar_matriz();
-    }        
+}
+
+int main()
+{
+    //inicia elevadores.
+    iniciando_elevador();
+    
+    int escolha;
+    
+while (1)
+{ 
+    // solicita um elevador 
+    printf("Aperte 1 para pedir um elevador?\n");
+    printf("Aperte 2 para continuar o trajeto\n");
+    printf("Aperte 3 para encerrar");
+    printf("\nFaça uma escolha: ");
+    int escolha;
+    scanf("%d", &escolha);  
+   
+
+    if (escolha == 1){
+       buscando_pedido();
+    }    
+        
+    if(escolha == 3)
+        exit(1);
 }
 
 
