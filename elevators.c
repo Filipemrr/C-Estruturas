@@ -297,13 +297,9 @@ void buscando_pedido(){
             andar_exclusao = andar_baixo;
             coluna_exclusao = coluna_baixo;
         }
-
-        //ir_ate_andar(andar_destino, andar, porta);             
-        matriz[andar_destino][porta] = "[\033[31m⊠\033[0m]";
-        printar_predio();
+        matriz[andar][porta] = "[\033[31m⊠\033[0m]";
         matriz[andar_exclusao][coluna_exclusao] = "[ ]";
-        matriz[andar][porta] = "[ ]";
-        limpar_matriz();
+        printar_predio();
 }
 
 int main()
