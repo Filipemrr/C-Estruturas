@@ -59,9 +59,10 @@ void iniciando_elevador()
     // printando posicao dos elevadores
     int indice = 0;
     printf("Elevadores estao nas posicoes:\n");
+    printf("\033[32m____________________\033[0m");
+    printf("\n");
     for (int j = 0; j < COLUNAS; j++)
     {
-        indice++;
         for (int k = 0; k < 5; k++)
         {
             int random_row = rand() % LINHAS;
@@ -71,6 +72,10 @@ void iniciando_elevador()
         }
         printf("\n");
     }
+    printf("\033[32m____________________\033[0m");
+    printf("\n");
+
+    return;
 }
 
 //Funcoes de deslocamento
@@ -310,7 +315,7 @@ void buscando_pedido()
     printf("\n");
     printf("\033[31m____________________\033[0m\n");
 
-    printf("Elevador %d cadastrado\n", i_fila);
+    printf("Elevador %d esta sendo usado\n", i_fila);
 
     printf("ANDAR ATUAL %d\n",calls[i_fila].andar_atual = andar);
     printf("PORTA ATUAL %d\n",calls[i_fila].corredor_atual = porta);
