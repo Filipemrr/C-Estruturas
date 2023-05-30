@@ -15,6 +15,7 @@ int andar_exclusao, coluna_exclusao; // auxiliar que indica o andar e a coluna d
 int elevador_mais_proximo_andar, elevador_mais_proximo_coluna;
 char *matriz[LINHAS][COLUNAS];
 int i_fila = 0;
+int soma = 0;
 
 typedef struct
 {
@@ -35,7 +36,7 @@ void limpar_matriz()
     {
         for (int j = 0; j < COLUNAS; j++)
         {
-            if (strcmp(matriz[i][j], "[\033[32m⇳\033[0m]") == 0 || strcmp(matriz[i][j], "[\033[93m⇫\033[0m]") == 0)
+            if (strcmp(matriz[i][j], "[\033[32m⇳\033[0m]") == 0)
             {
                 matriz[i][j] = "[ ]";
             }
@@ -315,18 +316,44 @@ void buscando_pedido()
     printf("\n");
     printf("\033[31m____________________\033[0m\n");
 
-    printf("Elevador %d esta sendo usado\n", i_fila);
+    printf("Elevador %d esta sendo usado e ele estava no andar %d\n", i_fila, andar_exclusao);
 
     printf("ANDAR ATUAL %d\n",calls[i_fila].andar_atual = andar);
     printf("PORTA ATUAL %d\n",calls[i_fila].corredor_atual = porta);
     printf("ANDAR DESTINO %d\n",calls[i_fila].andar_final = andar_destino);
-    printf("CORREDOR FINAL %d\n",calls[i_fila].corredor_final = porta);
+
     calls[i_fila].chegou = 0;
     i_fila++;
 
     printf("\033[31m____________________\033[0m\n");
 
 }
+
+//ultima funcao, anda tudo automaticamente e ate seus devidos lugares.
+void terminar_execucao()
+{
+    int chegou_todos = 0;
+    while (!chegou_todos)
+    {
+        chegou_todos = 1; // Supomos que todos os elevadores chegaram ao destino
+
+        for (int i = 0; i < i_fila; i++)
+        {
+            if (calls[i].chegou == 0)
+            {
+                caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].corredor_atual, i);
+                chegou_todos = 0; // Pelo menos um elevador não chegou ao destino
+            }
+        }
+    }
+
+    for (int i = 0; i < i_fila; i++)
+    {
+        printf("\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
+        usleep(600000);
+    }
+}
+
 
 int main()
 {
@@ -354,15 +381,7 @@ int main()
         }
         if (escolha == 2)
         {
-            for (int i = 0; i < i_fila; i++)
-            {
-                while (calls[i].chegou == 0)
-                {
-                    caminhar(calls[i].andar_final, calls[i].andar_atual,calls[i].corredor_atual, i);
-                }
-                usleep(60000);
-                printf("\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
-            }
+            terminar_execucao();
             exit(1);
         }
     }
