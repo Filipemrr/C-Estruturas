@@ -394,7 +394,7 @@ void buscando_pedido()
     calls[i_fila].chegou = 0;
     i_fila++;
     
-    if(i_fila > 15){
+    if(i_fila == 15){
         terminar_execucao(output);
         reaproveitar_elevadores();
     }
