@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-
+#define MAX_STRING_SIZE 10000
 #define LINHAS 300
 #define COLUNAS 3
 int andar_cima = 0;
@@ -16,6 +16,8 @@ int elevador_mais_proximo_andar, elevador_mais_proximo_coluna;
 char *matriz[LINHAS][COLUNAS];
 int i_fila = 0;
 int soma = 0;
+char output[MAX_STRING_SIZE] = ""; 
+int bandeira_final=0;
 
 typedef struct
 {
@@ -179,7 +181,52 @@ void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
     return;
 }
 
+//ultima funcao
+void terminar_execucao()
+{
+    int chegou_todos = 0;
+    char buffer[MAX_STRING_SIZE];  // Buffer temporário para cada resultado formatado
 
+    while (!chegou_todos)
+    {
+        chegou_todos = 1; // Supomos que todos os elevadores chegaram ao destino
+
+        for (int i = 0; i < i_fila; i++)
+        {
+            if (calls[i].chegou == 0)
+            {
+                caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].corredor_atual, i);
+                chegou_todos = 0; // Pelo menos um elevador não chegou ao destino
+            }
+        }
+    }
+    if (bandeira_final == 1){
+         for (int i = 0; i < i_fila; i++){
+        printf("\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
+        usleep(600000);
+        }
+        exit(1);
+    }
+    for (int i = 0; i < i_fila; i++)
+    {
+        sprintf(buffer, "\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
+        strcat(output, buffer);  // Concatena o resultado formatado na variável global 'output'
+        usleep(600000);
+    }
+    bandeira_final = 1;
+}
+
+void reutilizar_elevadores(){
+    for (int  i = 0; i < i_fila; i++){
+        calls[i].andar_final = 0;
+        calls[i].andar_atual = 0;
+        calls[i].corredor_atual = 0;
+        calls[i].corredor_final;
+        calls[i].chegou = 0;
+    }
+    i_fila = 0;
+    
+}
 //funcoes de procura
 int achar_mais_proximo(int andar, int porta)
 {
@@ -211,7 +258,7 @@ int achar_mais_proximo(int andar, int porta)
             if (andar + i >= LINHAS)
             {
                 flag_up = 0;
-                printf("\nNenhuma elevador acima");
+                //printf("\nNenhuma elevador acima");
                 break;
             }
         }
@@ -269,6 +316,10 @@ int achar_mais_proximo(int andar, int porta)
 }
 void buscando_pedido()
 {
+    if(i_fila > 14){
+        terminar_execucao();
+        reutilizar_elevadores();
+    }
     int flagCima = 0;
     int flagBaixo = 0;
     int andar, porta;
@@ -288,7 +339,7 @@ void buscando_pedido()
     if (andar > 299 || porta < 0 || porta > 2)
     {
         printf("Erro, entrada Invalida\n");
-        exit(1);
+        return;
     }
 
     retorno = achar_mais_proximo(andar, porta);
@@ -316,6 +367,7 @@ void buscando_pedido()
     printf("\n");
     printf("\033[31m____________________\033[0m\n");
 
+
     printf("Elevador %d esta sendo usado e ele estava no andar %d\n", i_fila, andar_exclusao);
 
     printf("ANDAR ATUAL %d\n",calls[i_fila].andar_atual = andar);
@@ -326,33 +378,10 @@ void buscando_pedido()
     i_fila++;
 
     printf("\033[31m____________________\033[0m\n");
-
 }
 
 //ultima funcao, anda tudo automaticamente e ate seus devidos lugares.
-void terminar_execucao()
-{
-    int chegou_todos = 0;
-    while (!chegou_todos)
-    {
-        chegou_todos = 1; // Supomos que todos os elevadores chegaram ao destino
 
-        for (int i = 0; i < i_fila; i++)
-        {
-            if (calls[i].chegou == 0)
-            {
-                caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].corredor_atual, i);
-                chegou_todos = 0; // Pelo menos um elevador não chegou ao destino
-            }
-        }
-    }
-
-    for (int i = 0; i < i_fila; i++)
-    {
-        printf("\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
-        usleep(600000);
-    }
-}
 
 
 int main()
@@ -381,6 +410,7 @@ int main()
         }
         if (escolha == 2)
         {
+            printf("\n%s\n", output);
             terminar_execucao();
             exit(1);
         }
