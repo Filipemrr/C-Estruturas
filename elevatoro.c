@@ -424,12 +424,28 @@ int main()
             // anda uma casa pra todo mundo
             for (int i = 0; i < i_fila; i++)
             {
-                if (calls[i].chegou == 0)
+                if (calls[i].chegou == 0){
                     caminhar(calls[i].andar_final, calls[i].andar_atual, calls[i].corredor_atual, i);
+
+                    for (int i = 0; i < 299; i++)
+                    {
+                        printf("%d", 299-i);
+                        for (int j = 0; j < 3; j++)
+                        {
+                            printf("%s", matriz[i][j]);
+                        }
+                        printf("\n");
+                    }
+                    
+                }
             }
         }
         if (escolha == 2)
         {
+            terminar_execucao(output);
+            exit(1);
+        }
+        if (escolha == 3){
             terminar_execucao(output);
             exit(1);
         }

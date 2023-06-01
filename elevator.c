@@ -166,6 +166,12 @@ void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
     {
         if (matriz[andar_atual + 1][coluna_atual] == "[\033[31m⊠\033[0m]" || matriz[andar_atual + 1][coluna_atual] == "[\033[91m⊠\033[0m]")
         {
+            for (int i = 0; i < i_fila; i++){
+                if(andar_atual+1 == calls[i].andar_atual && coluna_atual == calls[i].corredor_atual){
+                    calls[i].chegou = 0; break;
+                }
+            }
+            
             mover_ponto_vermelho_adjacente(andar_atual + 1, coluna_atual);
             andar_atual ++;
             matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]"; // anda uma casa
@@ -182,6 +188,11 @@ void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
     {
         if (matriz[andar_atual - 1][coluna_atual] == "[\033[31m⊠\033[0m]" || matriz[andar_atual - 1][coluna_atual] == "[\033[91m⊠\033[0m]")
         {
+            for (int i = 0; i < i_fila; i++){
+                if(andar_atual-1 == calls[i].andar_atual && coluna_atual == calls[i].corredor_atual){
+                    calls[i].chegou = 0; break;
+                }
+            }
             mover_ponto_vermelho_adjacente(andar_atual - 1, coluna_atual);
             andar_atual--;
             matriz[andar_atual][coluna_atual] = "[\033[91m⊠\033[0m]"; // anda uma casa
@@ -220,6 +231,7 @@ void terminar_execucao(char *output)
             }
         }
     }
+    
     if(bandeira_branca == 0){
         for (int i = 0; i < i_fila; i++)
         {
@@ -230,7 +242,7 @@ void terminar_execucao(char *output)
     if(bandeira_branca == 1){
         printf("%s\n", output);
         for (int i = 0; i < i_fila; i++){
-        printf("\033[32mO elevador %d chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", i, calls[i].andar_atual, calls[i].corredor_atual);
+        printf("\033[32mO elevador  chegou ao seu destino: Andar: %d pela Porta: %d\n\033[0m", calls[i].andar_atual, calls[i].corredor_atual);
         usleep(600000);
         }
         exit(1);
@@ -383,7 +395,7 @@ void buscando_pedido()
     calls[i_fila].chegou = 0;
     i_fila++;
     
-    if(i_fila == 15){
+    if(i_fila > 15){
         terminar_execucao(output);
         reaproveitar_elevadores();
     }
