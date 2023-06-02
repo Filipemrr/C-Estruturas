@@ -69,7 +69,7 @@ void iniciando_elevador()
     {
         for (int j = 0; j < COLUNAS; j++)
         {
-            if (matriz[i][j] == "[\033[91m⊠\033[0m]")
+            if (strcmp(matriz[i][j], "[\033[91m⊠\033[0m]") == 0)
             {
                 printf("Elevador encontrado no andar %d, coluna %d\n", i, j);
             }
@@ -99,53 +99,32 @@ void imprimir_matriz()
     printf("\n");
 }
 
-void reaproveitar_elevadores()
-{
-
-    for (int i = 0; i < LINHAS; i++)
-    {
-        for (int j = 0; j < COLUNAS; j++)
-        {
-            matriz[i][j] = "[\033[91m⊠\033[0m]"; // vermelho claro (disponivel))
-            matriz[i][j] = "[\033[31m⊠\033[0m]"; // vermelho escuro (indisponivel)
-        }
-    }
-
-    for (int i = 0; i < i_fila; i++)
-    {
-        calls[i].andar_final = 0;
-        calls[i].andar_atual = 0;
-        calls[i].corredor_atual = 0;
-        calls[i].corredor_final = 0;
-        calls[i].chegou = 0;
-    }
-    i_fila = 0;
-}
-
 // Funcoes de deslocamento
 void mover_ponto_vermelho_adjacente(int andar, int coluna)
 {
-    // Verificando e movendo o ponto vermelho para uma casa adjacente vazia
-
-    // coluna
-    if (coluna > 0 && matriz[andar][coluna - 1] == "[ ]")
+    
+    // coluna à esquerda
+    if (coluna > 0 && strcmp(matriz[andar][coluna - 1], "[ ]") == 0)
     {
-        matriz[andar][coluna - 1] = "[\033[91m⊠\033[0m]";
+        
+        strcpy(matriz[andar][coluna - 1], matriz[andar][coluna]);
 
         for (int i = 0; i < i_fila; i++)
         {
             if (calls[i].andar_atual == andar && calls[i].corredor_atual == coluna)
             {
-                calls[i].corredor_atual = coluna - 1;
+                printf("CORREDOR ATUAL %d .corredoratual %d", calls[i].corredor_atual, coluna);
+                calls[i].corredor_atual--;
             }
         }
 
-        matriz[andar][coluna] = "[ ]";
+        strcpy(matriz[andar][coluna], "[ ]");
     }
-    // coluna
-    else if (coluna < COLUNAS - 1 && matriz[andar][coluna + 1] == "[ ]")
+    // coluna à direita
+    else if (coluna < COLUNAS - 1 && strcmp(matriz[andar][coluna + 1], "[ ]") == 0)
     {
-        matriz[andar][coluna + 1] = "[\033[91m⊠\033[0m]";
+        printf("aaa");
+        strcpy(matriz[andar][coluna + 1], matriz[andar][coluna]);
 
         for (int i = 0; i < i_fila; i++)
         {
@@ -155,14 +134,15 @@ void mover_ponto_vermelho_adjacente(int andar, int coluna)
             }
         }
 
-        matriz[andar][coluna] = "[ ]";
+        strcpy(matriz[andar][coluna], "[ ]");
     }
 
-    // andar
-    else if (andar > 0 && matriz[andar - 1][coluna] == "[ ]")
+    // andar acima
+    else if (andar > 0 && strcmp(matriz[andar - 1][coluna], "[ ]") == 0)
     {
-        matriz[andar - 1][coluna] = "[\033[91m⊠\033[0m]";
-        // atualizando posicao do elevador deslocado
+        printf("aaa");
+        strcpy(matriz[andar - 1][coluna], matriz[andar][coluna]);
+
         for (int i = 0; i < i_fila; i++)
         {
             if (calls[i].andar_atual == andar && calls[i].corredor_atual == coluna)
@@ -171,13 +151,13 @@ void mover_ponto_vermelho_adjacente(int andar, int coluna)
             }
         }
 
-        matriz[andar][coluna] = "[ ]";
+        strcpy(matriz[andar][coluna], "[ ]");
     }
 
-    // andar
-    else if (andar < LINHAS - 1 && matriz[andar + 1][coluna] == "[ ]")
+    // andar abaixo
+    else if (andar < LINHAS - 1 && strcmp(matriz[andar + 1][coluna], "[ ]") == 0)
     {
-        matriz[andar + 1][coluna] = "[\033[91m⊠\033[0m]";
+        strcpy(matriz[andar + 1][coluna], matriz[andar][coluna]);
         for (int i = 0; i < i_fila; i++)
         {
             if (calls[i].andar_atual == andar && calls[i].corredor_atual == coluna)
@@ -185,28 +165,30 @@ void mover_ponto_vermelho_adjacente(int andar, int coluna)
                 calls[i].andar_atual = andar + 1;
             }
         }
-        matriz[andar][coluna] = "[ ]";
+        strcpy(matriz[andar][coluna], "[ ]");
     }
 }
+
 void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
 {
     if (andar_desejado > andar_atual)
     {
-        if (matriz[andar_atual + 1][coluna_atual] == "[\033[91m⊠\033[0m]" || matriz[andar_atual + 1][coluna_atual] == "[\033[31m⊠\033[0m]")
-        {
-            for (int i = 0; i < i_fila; i++)
+        if (strcmp(matriz[andar_atual + 1][coluna_atual], "[\033[91m⊠\033[0m]")
+            == 0 || strcmp(matriz[andar_atual + 1][coluna_atual], "[\033[31m⊠\033[0m]") == 0)
             {
-                if (andar_atual + 1 == calls[i].andar_atual && coluna_atual == calls[i].corredor_atual)
+                for (int i = 0; i < i_fila; i++)
                 {
-                    calls[i].chegou = 0;
-                    break;
+                    if (andar_atual + 1 == calls[i].andar_atual && coluna_atual == calls[i].corredor_atual)
+                    {
+                        calls[i].chegou = 0;
+                        break;
+                    }
                 }
+                mover_ponto_vermelho_adjacente(andar_atual + 1, coluna_atual);
+                andar_atual++;
+                matriz[andar_atual][coluna_atual] = "[\033[31m⊠\033[0m]"; // anda uma casa
+                matriz[andar_atual - 1][coluna_atual] = "[ ]";            // libera a casa que ele estava anteriormente
             }
-            mover_ponto_vermelho_adjacente(andar_atual + 1, coluna_atual);
-            andar_atual++;
-            matriz[andar_atual][coluna_atual] = "[\033[31m⊠\033[0m]"; // anda uma casa
-            matriz[andar_atual - 1][coluna_atual] = "[ ]";            // libera a casa que ele estava anteriormente
-        }
         else
         {
             matriz[andar_atual + 1][coluna_atual] = "[\033[31m⊠\033[0m]";
@@ -219,7 +201,7 @@ void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
     else if (andar_desejado < andar_atual)
     {
 
-        if (matriz[andar_atual - 1][coluna_atual] == "[\033[91m⊠\033[0m]" || matriz[andar_atual - 1][coluna_atual] == "[\033[31m⊠\033[0m]")
+        if (strcmp(matriz[andar_atual - 1][coluna_atual], "[\033[91m⊠\033[0m]") == 0 || strcmp(matriz[andar_atual - 1][coluna_atual], "[\033[31m⊠\033[0m]") == 0)
         {
             for (int i = 0; i < i_fila; i++)
             {
@@ -258,7 +240,7 @@ void caminhar(int andar_desejado, int andar_atual, int coluna_atual, int indice)
 
 void terminar_execucao()
 {
-    
+
     int chegou_todos = 0;
     while (!chegou_todos)
     {
@@ -266,7 +248,7 @@ void terminar_execucao()
 
         for (int i = 0; i < i_fila; i++)
         {
-            //printf("LINE: %d\n", __LINE__);//
+            // printf("LINE: %d\n", __LINE__);//
             if (calls[i].chegou == 0)
             {
                 if (calls[i].tem_gente == 0)
@@ -298,11 +280,11 @@ int achar_mais_proximo(int andar, int porta)
         for (int w = 0; w < 3; w++)
         {
             // achou
-            if (matriz[andar + i][w] == "[\033[91m⊠\033[0m]")
+            if (strcmp(matriz[andar + i][w], "[\033[91m⊠\033[0m]") == 0)
             {
                 flag_up = 1;
 
-                if (matriz[andar + i][porta] != "[ ]")
+                if (strcmp(matriz[andar + i][porta], "[ ]"))
                     coluna_cima = porta;
                 else
                     coluna_cima = w;
@@ -332,12 +314,12 @@ int achar_mais_proximo(int andar, int porta)
         {
 
             // achou
-            if (matriz[andar - i][w] == "[\033[91m⊠\033[0m]")
+            if (strcmp(matriz[andar - i][w], "[\033[91m⊠\033[0m]") == 0)
             {
                 flag_down = 1;
                 andar_baixo = andar - i;
 
-                if (matriz[andar + i][porta] != "[ ]")
+                if (strcmp(matriz[andar + i][porta], "[ ]"))
                     coluna_baixo = porta;
                 else
                     coluna_baixo = w;
