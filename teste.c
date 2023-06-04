@@ -17,7 +17,7 @@ int andar_exclusao, coluna_exclusao; // auxiliar que indica o andar e a coluna d
 int elevador_mais_proximo_andar, elevador_mais_proximo_coluna;
 char *matriz[LINHAS][COLUNAS];
 int i_fila = 0;
-int k = 0;
+
 typedef struct
 {
     int andar_atual;
@@ -106,18 +106,8 @@ void reaproveitar_elevadores()
     {
         for (int j = 0; j < COLUNAS; j++)
         {
-            if(calls[k].andar_final == i && calls[k].corredor_final == j){
-            matriz[i][j] = "[\033[91m⊠\033[0m]"; // vermelho claro (disponivel)
-            k++;
-            }
-        }
-    }
-    for (int i = 0; i < LINHAS; i++)
-    {
-        for (int j = 0; j < COLUNAS; j++)
-        {
-            if(matriz[i][j] == "[\033[91m⊠\033[0m]" || matriz[i][j] == "[\033[31m⊠\033[0m]")
-                matriz[i][j] = "[\033[91m⊠\033[0m]";
+            matriz[i][j] = "[\033[91m⊠\033[0m]"; // vermelho claro (disponivel))
+            matriz[i][j] = "[\033[31m⊠\033[0m]"; // vermelho escuro (indisponivel)
         }
     }
 
@@ -384,14 +374,6 @@ int achar_mais_proximo(int andar, int porta)
 }
 int buscando_pedido()
 {
-    if (i_fila > 14){
-        terminar_execucao();
-        reaproveitar_elevadores();
-        imprimir_matriz();
-        exit(1);
-    }
-    
-
     int flagCima = 0;
     int flagBaixo = 0;
     int andar, porta;
