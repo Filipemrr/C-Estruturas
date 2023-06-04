@@ -18,6 +18,7 @@ int elevador_mais_proximo_andar, elevador_mais_proximo_coluna;
 char *matriz[LINHAS][COLUNAS];
 int i_fila = 0;
 int k = 0;
+int bandeira = 0;
 
 typedef struct
 {
@@ -144,8 +145,13 @@ void reaproveitar_elevadores()
         calls[i].tem_gente = 0;
         calls[i].pedida = 0;
         calls[i].corredor_final = 0;
-
     }
+    andar_cima = 0;
+    coluna_cima = 0;
+    andar_baixo = 0;
+    coluna_baixo = 0;
+    tem_gente = 0;
+    k = 0;
     i_fila = 0;
 }
 
@@ -307,6 +313,17 @@ void terminar_execucao()
     imprimir_matriz();
 }
 
+void limpar_matriz(){
+     for (int i = 0; i < LINHAS; i++)
+    {
+        for (int j = 0; j < COLUNAS; j++)
+        {
+            if(matriz[i][j] == "[\033[91m⊠\033[0m]" && matriz[i][j] == "[ ]")
+                matriz[i][j] = "[ ]"; // vermelho claro (disponivel)
+            
+        }
+    }
+}
 // funcoes de procura
 int achar_mais_proximo(int andar, int porta)
 {
@@ -396,12 +413,33 @@ int achar_mais_proximo(int andar, int porta)
 int buscando_pedido()
 {
 
-    if (i_fila > 14){
+    if (i_fila > 14 && bandeira == 0){
             terminar_execucao();
             reaproveitar_elevadores();
-            return 3;
+            bandeira = 1;
     }
+    if (i_fila > 12 && bandeira == 1){
+        for (int i = 0; i < 15; i++)
+            printf("\033[32mO elevador  chegou ao seu destino: Andar: %d pela porta %d \n\033[0m", auxiliar[i].andar_atual, auxiliar[i].corredor_atual);
 
+                for (int i = 0; i < 13; i++){
+                    printf("\033[32mO elevador  chegou ao seu destino: Andar: %d pela porta %d \n\033[0m", calls[i].andar_final, calls[i].corredor_final);
+                    
+                    if(matriz[calls[i].andar_final][calls[i].corredor_final] == "[\033[91m⊠\033[0m]" && calls[i].corredor_final < 2)
+                        matriz[calls[i].andar_final][calls[i].corredor_final + 1] = "[\033[91m⊠\033[0m]";
+
+                    else if (matriz[calls[i].andar_final][calls[i].corredor_final] == "[\033[91m⊠\033[0m]" && calls[i].corredor_final < 1)
+                        matriz[calls[i].andar_final][calls[i].corredor_final + 1] = "[\033[91m⊠\033[0m]";
+
+                    matriz[calls[i].andar_final][calls[i].corredor_final] = "[\033[91m⊠\033[0m]";
+                }
+
+            limpar_matriz();
+            imprimir_matriz();
+
+        exit(1);
+    }
+    
     int flagCima = 0;
     int flagBaixo = 0;
     int andar, porta;
@@ -477,12 +515,7 @@ int main()
 
         if (escolha == 1)
         {
-            if (buscando_pedido() == 3){
-                imprimir_matriz();
-                for (int i = 0; i < 15; i++)
-                printf("\033[32mO elevador  chegou ao seu destino: Andar: %d pela porta %d \n\033[0m", auxiliar[i].andar_atual, auxiliar[i].corredor_atual);
-                exit(1);
-            }
+            buscando_pedido();
 
             printf("Movimentos: \n");
             for (int i = 0; i < i_fila; i++)
@@ -502,6 +535,7 @@ int main()
                 }
             }
             printf("\n");    
+            imprimir_matriz();
         }
 
         if (escolha == 2){
