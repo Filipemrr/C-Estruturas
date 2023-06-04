@@ -539,6 +539,7 @@ int main()
         }
 
         if (escolha == 2){
+            terminar_execucao();
             imprimir_matriz();
             exit(1);
         }
